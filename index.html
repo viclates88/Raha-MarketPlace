@@ -4,179 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Raha Market</title>
-    <style>
-        :root { --p: #0984e3; --s: #00b894; --bg: #f1f2f6; --danger: #d63031; }
-        body { font-family: sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; }
-        header { background: linear-gradient(135deg, var(--p), #6c5ce7); color: white; padding: 25px; text-align: center; border-radius: 0 0 30px 30px; }
-        .box { background: white; margin: 10px 15px; padding: 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .categories { display: flex; gap: 8px; overflow-x: auto; padding: 10px 15px; scrollbar-width: none; }
-        .cat { background: white; padding: 8px 15px; border-radius: 10px; font-size: 12px; white-space: nowrap; cursor: pointer; border: 1px solid #eee; }
-        .cat.active { background: var(--p); color: white; border-color: var(--p); }
-        
-        #grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 15px; }
-        .card { background: white; border-radius: 15px; overflow: hidden; position: relative; }
-        .card img { width: 100%; height: 120px; object-fit: cover; }
-        .card-info { padding: 10px; }
-        .card h3 { margin: 0; font-size: 13px; height: 32px; overflow: hidden; color: #333; }
-        .price { color: var(--p); font-weight: bold; font-size: 14px; display: block; margin-top: 5px; }
-        .time { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); color: white; font-size: 9px; padding: 2px 6px; border-radius: 5px; }
-
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: flex-end; }
-        .modal-c { background: white; width: 100%; max-width: 500px; padding: 20px; border-radius: 25px 25px 0 0; animation: up 0.3s; max-height: 85vh; overflow-y: auto; }
-        @keyframes up { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-        .star-box { color: #f1c40f; font-size: 22px; margin: 10px 0; }
-        .fab { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background: var(--s); color: white; border-radius: 50%; border: none; font-size: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        input, textarea, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-
-<header>
-    <div style="font-weight: bold; font-size: 18px;">🛒 RAHA MARKET</div>
-    <div style="font-size: 11px; opacity: 0.8;">Jual Beli Amanah di Pulau Muna</div>
-</header>
-
-<div class="box" id="auth-ui">
-    <div id="login-form" style="display:flex; gap:5px;">
-        <input type="text" id="in-nama" placeholder="Nama ko..." style="margin:0;">
-        <button onclick="login()" style="background:var(--p); color:white; border:none; padding:0 15px; border-radius:10px;">Masuk</button>
+<body class="bg-blue-50 pb-20">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 text-white text-center rounded-b-3xl shadow-lg">
+        <h1 class="text-2xl font-bold">🛒 RAHA MARKET</h1>
+        <p class="text-sm opacity-80">Jual Beli Amanah di Pulau Muna</p>
     </div>
-    <div id="user-status" style="display:none; justify-content:space-between; align-items:center;">
-        <span>Halo, <b><span id="u-name"></span></b>!</span>
-        <button onclick="logout()" style="border:none; color:red; background:none; font-size:12px;">Keluar</button>
+
+    <!-- Container Barang -->
+    <div id="item-list" class="p-4 grid grid-cols-1 gap-4">
+        <p class="text-center text-gray-500">Memuat jualan...</p>
     </div>
-</div>
 
-<div class="box" style="display:flex; align-items:center; gap:8px;">
-    🔍 <input type="text" id="search" placeholder="Cari barang..." oninput="filter()" style="border:none; outline:none; margin:0;">
-</div>
+    <!-- Tombol Tambah Jualan -->
+    <button onclick="bukaModal()" class="fixed bottom-6 right-6 bg-emerald-500 text-white p-4 rounded-full shadow-2xl text-2xl">+</button>
 
-<div class="categories">
-    <div class="cat active" onclick="setK('Semua', this)">Semua</div>
-    <div class="cat" onclick="setK('Elektronik', this)">HP</div>
-    <div class="cat" onclick="setK('Motor', this)">Motor</div>
-    <div class="cat" onclick="setK('Makanan', this)">Makan</div>
-</div>
-
-<div id="grid"></div>
-
-<button class="fab" onclick="openM('m-post')">+</button>
-
-<!-- MODAL POST -->
-<div id="m-post" class="modal" onclick="closeM(event, 'm-post')">
-    <div class="modal-c">
-        <h3>Jual Barang</h3>
-        <input type="text" id="p-nama" placeholder="Nama Barang">
-        <input type="text" id="p-harga" placeholder="Harga (Cth: 50.000)">
-        <select id="p-kat"><option value="Lainnya">Kategori</option><option value="Elektronik">Elektronik</option><option value="Motor">Motor</option><option value="Makanan">Makanan</option></select>
-        <input type="number" id="p-wa" placeholder="Nomor WA (628...)">
-        <textarea id="p-desc" placeholder="Deskripsi barang..."></textarea>
-        <input type="file" id="p-foto" accept="image/*">
-        <button id="btn-up" onclick="post()" class="btn" style="background:var(--p); color:white;">🚀 Posting</button>
+    <!-- Modal Form (Sederhana) -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-2xl w-full max-w-md">
+            <h2 class="text-xl font-bold mb-4">Tambah Jualan</h2>
+            <input id="nama" type="text" placeholder="Nama Barang" class="w-full border p-2 rounded mb-2">
+            <input id="harga" type="number" placeholder="Harga (Rp)" class="w-full border p-2 rounded mb-2">
+            <input id="wa" type="text" placeholder="No WhatsApp (Contoh: 0812...)" class="w-full border p-2 rounded mb-4">
+            <div class="flex gap-2">
+                <button onclick="tutupModal()" class="flex-1 bg-gray-200 p-2 rounded">Batal</button>
+                <button onclick="simpanBarang()" class="flex-1 bg-blue-600 text-white p-2 rounded">Posting</button>
+            </div>
+        </div>
     </div>
-</div>
 
-<!-- MODAL DETAIL -->
-<div id="m-detail" class="modal" onclick="closeM(event, 'm-detail')">
-    <div class="modal-c" id="det-box"></div>
-</div>
+    <script>
+        // Ambil Data dari MongoDB
+        async function loadItems() {
+            const res = await fetch('/api/items');
+            const items = await res.json();
+            const list = document.getElementById('item-list');
+            list.innerHTML = '';
 
-<script>
-    let produk = [], kat = "Semua", user = localStorage.getItem('userRaha');
+            if (items.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-400">Belum ada jualan. Jadilah yang pertama!</p>';
+                return;
+            }
 
-    function login() { let n = document.getElementById('in-nama').value; if(n){ localStorage.setItem('userRaha', n); location.reload(); } }
-    function logout() { localStorage.removeItem('userRaha'); location.reload(); }
-    if(user) { document.getElementById('login-form').style.display='none'; document.getElementById('user-status').style.display='flex'; document.getElementById('u-name').innerText=user; }
+            items.forEach(item => {
+                list.innerHTML += `
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-100">
+                        <h3 class="font-bold text-lg">${item.nama}</h3>
+                        <p class="text-blue-600 font-bold text-xl">Rp ${Number(item.harga).toLocaleString('id-ID')}</p>
+                        <a href="https://wa.me/${item.wa}" class="mt-3 block text-center bg-green-500 text-white py-2 rounded-xl text-sm font-bold">Chat Penjual</a>
+                    </div>
+                `;
+            });
+        }
 
-    function openM(id) { document.getElementById(id).style.display='flex'; }
-    function closeM(e, id) { if(e.target.id === id) document.getElementById(id).style.display='none'; }
+        // Simpan Data ke MongoDB
+        async function simpanBarang() {
+            const data = {
+                nama: document.getElementById('nama').value,
+                harga: document.getElementById('harga').value,
+                wa: document.getElementById('wa').value
+            };
 
-    async function load() {
-        const r = await fetch('/api/produk'); produk = await r.json(); render(produk);
-    }
+            await fetch('/api/items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
 
-    function render(data) {
-        document.getElementById('grid').innerHTML = data.slice().reverse().map(p => `
-            <div class="card" onclick="detail(${p.id})">
-                <span class="time">${Math.floor((Date.now()-p.id)/60000)}m lalu</span>
-                <img src="${p.foto}">
-                <div class="card-info"><h3>${p.nama}</h3><span class="price">Rp ${p.harga}</span></div>
-            </div>
-        `).join('');
-    }
+            tutupModal();
+            loadItems(); // Refresh daftar
+        }
 
-    async function detail(id) {
-        const p = produk.find(x => x.id === id);
-        const r = await fetch(`/api/rating/${p.pemilik}`);
-        const rD = await r.json();
-        document.getElementById('det-box').innerHTML = `
-            <img src="${p.foto}" style="width:100%; border-radius:15px; margin-bottom:10px;">
-            <div style="display:flex; justify-content:space-between;">
-                <h2>${p.nama}</h2>
-                <span style="color:#f39c12; font-weight:bold;">⭐ ${rD.skor}</span>
-            </div>
-            <span class="price" style="font-size:20px;">Rp ${p.harga}</span>
-            <p style="color:#666;">${p.deskripsi || 'Nda ada deskripsi.'}</p>
-            <div style="background:#f8f9fa; padding:10px; border-radius:10px;">
-                <p style="font-size:11px; margin:0 0 5px;">Rating Penjual (${p.pemilik}):</p>
-                <div class="star-box">
-                    <span onclick="rate('${p.pemilik}',1)">⭐</span><span onclick="rate('${p.pemilik}',2)">⭐</span><span onclick="rate('${p.pemilik}',3)">⭐</span><span onclick="rate('${p.pemilik}',4)">⭐</span><span onclick="rate('${p.pemilik}',5)">⭐</span>
-                </div>
-            </div>
-            <a href="https://wa.me/${p.wa}?text=Halo ${p.pemilik}, sa minat ${p.nama}" style="display:block; background:var(--s); color:white; text-align:center; padding:15px; border-radius:10px; text-decoration:none; margin-top:10px; font-weight:bold;">Hubungi Penjual</a>
-            ${user === p.pemilik ? `<button onclick="hapus(${p.id})" style="width:100%; background:none; border:none; color:red; margin-top:15px;">Hapus Jualan</button>` : ''}
-        `;
-        openM('m-detail');
-    }
+        function bukaModal() { document.getElementById('modal').classList.remove('hidden'); }
+        function tutupModal() { document.getElementById('modal').classList.add('hidden'); }
 
-    async function rate(penjual, star) {
-        if(!user) return alert("Login dulu!");
-        await fetch('/api/rating', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ penjual, star }) });
-        alert("Sip, rating terkirim!"); location.reload();
-    }
-
-    function setK(k, el) { 
-        kat = k; document.querySelectorAll('.cat').forEach(c => c.classList.remove('active')); 
-        el.classList.add('active'); filter(); 
-    }
-
-    function filter() {
-        const s = document.getElementById('search').value.toLowerCase();
-        render(produk.filter(p => p.nama.toLowerCase().includes(s) && (kat === "Semua" || p.kategori === kat)));
-    }
-
-    async function post() {
-        if(!user) return alert("Login dulu!");
-        const f = document.getElementById('p-foto').files[0];
-        if(!f) return alert("Foto mana?");
-        document.getElementById('btn-up').innerText = "Uploading...";
-        
-        // Kompres Gambar Sederhana
-        const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d'), img = new Image();
-        img.src = URL.createObjectURL(f);
-        img.onload = async () => {
-            canvas.width = 600; canvas.height = (img.height/img.width)*600;
-            ctx.drawImage(img, 0, 0, 600, canvas.height);
-            canvas.toBlob(async (blob) => {
-                const fd = new FormData();
-                fd.append('nama', document.getElementById('p-nama').value);
-                fd.append('harga', document.getElementById('p-harga').value);
-                fd.append('kategori', document.getElementById('p-kat').value);
-                fd.append('wa', document.getElementById('p-wa').value);
-                fd.append('deskripsi', document.getElementById('p-desc').value);
-                fd.append('penjual', user);
-                fd.append('foto', blob, 'foto.jpg');
-                await fetch('/api/produk', { method: 'POST', body: fd });
-                location.reload();
-            }, 'image/jpeg', 0.7);
-        };
-    }
-
-    async function hapus(id) { if(confirm("Hapus?")) { await fetch(`/api/produk/${id}?user=${user}`, { method: 'DELETE' }); location.reload(); } }
-
-    load();
-</script>
+        loadItems(); // Jalankan saat web dibuka
+    </script>
 </body>
 </html>
