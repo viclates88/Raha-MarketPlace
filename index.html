@@ -6,66 +6,106 @@
     <title>Raha Market</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-blue-50 pb-20">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 text-white text-center rounded-b-3xl shadow-lg">
-        <h1 class="text-2xl font-bold">🛒 RAHA MARKET</h1>
-        <p class="text-sm opacity-80">Jual Beli Amanah di Pulau Muna</p>
+<body class="bg-slate-100 pb-24 font-sans">
+    <!-- Header Biru -->
+    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-8 text-white text-center rounded-b-[2.5rem] shadow-md">
+        <h1 class="text-2xl font-bold tracking-tight">🛒 RAHA MARKET</h1>
+        <p class="text-xs opacity-80 mt-1">Jual Beli Amanah di Pulau Muna</p>
     </div>
 
-    <!-- Container Barang -->
-    <div id="item-list" class="p-4 grid grid-cols-1 gap-4">
-        <p class="text-center text-gray-500">Memuat jualan...</p>
+    <!-- Kotak Nama & Masuk -->
+    <div class="px-4 -mt-6">
+        <div class="bg-white p-4 rounded-2xl shadow-sm flex gap-2 border border-gray-100">
+            <input type="text" placeholder="Nama ko..." class="flex-1 bg-slate-50 border border-gray-200 p-3 rounded-xl outline-none text-sm">
+            <button class="bg-blue-500 text-white px-6 py-3 rounded-xl font-bold text-sm">Masuk</button>
+        </div>
     </div>
 
-    <!-- Tombol Tambah Jualan -->
-    <button onclick="bukaModal()" class="fixed bottom-6 right-6 bg-emerald-500 text-white p-4 rounded-full shadow-2xl text-2xl">+</button>
+    <!-- Kotak Cari Barang -->
+    <div class="px-4 mt-4">
+        <div class="bg-white p-4 rounded-2xl shadow-sm flex items-center gap-3 border border-gray-100">
+            <span class="text-xl">🔍</span>
+            <input type="text" placeholder="Cari barang..." class="flex-1 outline-none text-sm">
+        </div>
+    </div>
 
-    <!-- Modal Form (Sederhana) -->
-    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-2xl w-full max-w-md">
-            <h2 class="text-xl font-bold mb-4">Tambah Jualan</h2>
-            <input id="nama" type="text" placeholder="Nama Barang" class="w-full border p-2 rounded mb-2">
-            <input id="harga" type="number" placeholder="Harga (Rp)" class="w-full border p-2 rounded mb-2">
-            <input id="wa" type="text" placeholder="No WhatsApp (Contoh: 0812...)" class="w-full border p-2 rounded mb-4">
-            <div class="flex gap-2">
-                <button onclick="tutupModal()" class="flex-1 bg-gray-200 p-2 rounded">Batal</button>
-                <button onclick="simpanBarang()" class="flex-1 bg-blue-600 text-white p-2 rounded">Posting</button>
+    <!-- Kategori -->
+    <div class="px-4 mt-4 flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+        <button class="bg-blue-500 text-white px-5 py-2 rounded-xl text-sm font-medium">Semua</button>
+        <button class="bg-white text-gray-600 px-5 py-2 rounded-xl text-sm font-medium border border-gray-100">HP</button>
+        <button class="bg-white text-gray-600 px-5 py-2 rounded-xl text-sm font-medium border border-gray-100">Motor</button>
+        <button class="bg-white text-gray-600 px-5 py-2 rounded-xl text-sm font-medium border border-gray-100">Makan</button>
+    </div>
+
+    <!-- Daftar Barang (Grid 2 Kolom) -->
+    <div id="item-list" class="px-4 mt-2 grid grid-cols-2 gap-4">
+        <p class="col-span-2 text-center text-gray-400 py-10">Memuat jualan...</p>
+    </div>
+
+    <!-- Tombol Tambah Hijau Bulat -->
+    <button onclick="bukaModal()" class="fixed bottom-8 right-6 bg-emerald-400 text-white w-16 h-16 rounded-full shadow-lg text-3xl flex items-center justify-center font-light transition-transform active:scale-90">+</button>
+
+    <!-- Modal Form (Tetap ada fitur Upload Link) -->
+    <div id="modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-3xl w-full max-w-sm shadow-xl">
+            <h2 class="text-xl font-bold mb-4 text-gray-800 text-center">Tambah Jualan</h2>
+            <div class="space-y-3 text-sm">
+                <input id="nama" type="text" placeholder="Nama Barang" class="w-full bg-slate-50 border border-gray-200 p-3 rounded-xl outline-none">
+                <input id="harga" type="number" placeholder="Harga (Rp)" class="w-full bg-slate-50 border border-gray-200 p-3 rounded-xl outline-none">
+                <input id="wa" type="text" placeholder="No WhatsApp (08...)" class="w-full bg-slate-50 border border-gray-200 p-3 rounded-xl outline-none">
+                <input id="gambar" type="text" placeholder="Link Gambar (Opsional)" class="w-full bg-slate-50 border border-gray-200 p-3 rounded-xl outline-none">
+                <a href="https://postimages.org/" target="_blank" class="block text-center text-blue-500 font-bold text-xs underline py-1">Klik di sini untuk upload foto</a>
+            </div>
+            <div class="flex gap-2 mt-6">
+                <button onclick="tutupModal()" class="flex-1 py-3 text-gray-500 font-bold">Batal</button>
+                <button onclick="simpanBarang()" class="flex-1 bg-blue-500 text-white py-3 rounded-xl font-bold shadow-md shadow-blue-100">Posting</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Ambil Data dari MongoDB
         async function loadItems() {
-            const res = await fetch('/api/items');
-            const items = await res.json();
-            const list = document.getElementById('item-list');
-            list.innerHTML = '';
+            try {
+                const res = await fetch('/api/items');
+                const items = await res.json();
+                const list = document.getElementById('item-list');
+                list.innerHTML = '';
 
-            if (items.length === 0) {
-                list.innerHTML = '<p class="text-center text-gray-400">Belum ada jualan. Jadilah yang pertama!</p>';
-                return;
+                if (items.length === 0) {
+                    list.innerHTML = '<p class="col-span-2 text-center text-gray-400 mt-10">Belum ada jualan.</p>';
+                    return;
+                }
+
+                items.forEach(item => {
+                    const foto = (item.gambar && item.gambar.trim() !== "") ? item.gambar : 'https://via.placeholder.com/300x300?text=No+Image';
+                    list.innerHTML += `
+                        <div class="bg-white rounded-[1.5rem] shadow-sm overflow-hidden flex flex-col border border-gray-50">
+                            <div class="relative">
+                                <img src="${foto}" class="w-full h-32 object-cover" onerror="this.src='https://via.placeholder.com/300x300?text=Link+Error'">
+                                <span class="absolute top-2 right-2 bg-black/40 text-[10px] text-white px-2 py-0.5 rounded-md backdrop-blur-sm">Baru</span>
+                            </div>
+                            <div class="p-3">
+                                <h3 class="text-sm font-medium text-gray-700 line-clamp-1">${item.nama}</h3>
+                                <p class="text-blue-500 font-bold text-md mt-1">Rp ${Number(item.harga).toLocaleString('id-ID')}</p>
+                                <a href="https://wa.me/${item.wa.replace(/^0/, '62')}" target="_blank" class="mt-2 block text-center text-emerald-500 text-[11px] font-bold border border-emerald-100 py-1 rounded-lg">HUBUNGI</a>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (e) {
+                console.log("Error loading items");
             }
-
-            items.forEach(item => {
-                list.innerHTML += `
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-100">
-                        <h3 class="font-bold text-lg">${item.nama}</h3>
-                        <p class="text-blue-600 font-bold text-xl">Rp ${Number(item.harga).toLocaleString('id-ID')}</p>
-                        <a href="https://wa.me/${item.wa}" class="mt-3 block text-center bg-green-500 text-white py-2 rounded-xl text-sm font-bold">Chat Penjual</a>
-                    </div>
-                `;
-            });
         }
 
-        // Simpan Data ke MongoDB
         async function simpanBarang() {
             const data = {
                 nama: document.getElementById('nama').value,
                 harga: document.getElementById('harga').value,
-                wa: document.getElementById('wa').value
+                wa: document.getElementById('wa').value,
+                gambar: document.getElementById('gambar').value
             };
+
+            if(!data.nama || !data.harga) return alert("Isi nama & harga dulu!");
 
             await fetch('/api/items', {
                 method: 'POST',
@@ -74,13 +114,13 @@
             });
 
             tutupModal();
-            loadItems(); // Refresh daftar
+            loadItems();
         }
 
         function bukaModal() { document.getElementById('modal').classList.remove('hidden'); }
         function tutupModal() { document.getElementById('modal').classList.add('hidden'); }
 
-        loadItems(); // Jalankan saat web dibuka
+        loadItems();
     </script>
 </body>
 </html>
