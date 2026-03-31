@@ -1,46 +1,56 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const path = require('path');
-const fs = require('fs');
 const app = express();
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// --- KONFIGURASI DATABASE ---
+const mongoURI = "mongodb+srv://adhityabima:[PASSWORD_ASLIMU]@cluster0.qizddv3.mongodb.net/raha_market?retryWrites=true&w=majority&appName=Cluster0";
 
-// PENTING: Arahkan ke folder public atau folder utama
+mongoose.connect(mongoURI)
+  .then(() => console.log("Terhubung ke MongoDB!"))
+  .catch(err => console.log("Error Database:", err));
+
+// Schema Data Barang
+const ItemSchema = new mongoose.Schema({
+    nama: String,
+    harga: Number,
+    kategori: String,
+    penjual: String,
+    wa: String,
+    tanggal: { type: Date, default: Date.now }
+});
+const Item = mongoose.model('Item', ItemSchema);
+
+// --- MIDDLEWARE ---
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(__dirname));
 
-// Database sederhana (Vercel bersifat Read-Only, jadi ini untuk tampilkan data saja)
-const databaseFile = path.join(__dirname, 'database.json');
+// --- ROUTE API ---
 
-// Route utama untuk ambil data barang
-app.get('/api/items', (req, res) => {
-    if (fs.existsSync(databaseFile)) {
-        const data = fs.readFileSync(databaseFile);
-        res.json(JSON.parse(data));
-    } else {
-        res.json([]);
+// Ambil semua barang dari MongoDB
+app.get('/api/items', async (req, res) => {
+    try {
+        const items = await Item.find().sort({ tanggal: -1 });
+        res.json(items);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 
-// Route untuk simpan barang (Catatan: Di Vercel Free, simpan data bersifat sementara)
-app.post('/api/items', (req, res) => {
-    const newItem = req.body;
-    let items = [];
-    if (fs.existsSync(databaseFile)) {
-        items = JSON.parse(fs.readFileSync(databaseFile));
+// Simpan barang ke MongoDB
+app.post('/api/items', async (req, res) => {
+    try {
+        const newItem = new Item(req.body);
+        await newItem.save();
+        res.status(201).json(newItem);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
     }
-    items.push(newItem);
-    // fs.writeFileSync(databaseFile, JSON.stringify(items)); // Vercel nda izinkan tulis file permanen
-    res.status(201).json(newItem);
 });
 
-// Jalur untuk buka halaman utama
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// BAGIAN PALING PENTING UNTUK VERCEL
-// Kita nda pakai app.listen(3000) lagi
 module.exports = app;
