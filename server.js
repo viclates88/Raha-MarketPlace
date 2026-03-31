@@ -4,7 +4,7 @@ const path = require('path');
 const app = express();
 
 // --- KONFIGURASI DATABASE ---
-const mongoURI = "mongodb+srv://adhityabima:[PASSWORD_ASLIMU]@cluster0.qizddv3.mongodb.net/raha_market?retryWrites=true&w=majority&appName=Cluster0";
+const mongoURI = "mongodb+srv://adhityabima:ZBqGgf6l4VGilbHa@cluster0.qizddv3.mongodb.net/raha_market?retryWrites=true&w=majority&appName=Cluster0";
 
 mongoose.connect(mongoURI)
   .then(() => console.log("Terhubung ke MongoDB!"))
