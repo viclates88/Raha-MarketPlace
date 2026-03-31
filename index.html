@@ -2,69 +2,70 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Raha Market</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Pengaman biar nda kedip pas loading */
-        [v-cloak] { display: none; }
+        body { -webkit-tap-highlight-color: transparent; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        /* Cegah kedip putih saat render */
+        #item-list { min-height: 200px; }
     </style>
 </head>
-<body class="bg-slate-100 pb-24 font-sans">
+<body class="bg-slate-100 pb-24">
 
-    <!-- Header Biru -->
-    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-8 text-white text-center rounded-b-[2.5rem] shadow-md">
-        <h1 class="text-2xl font-bold tracking-tight">🛒 RAHA MARKET</h1>
-        <p class="text-xs opacity-80 mt-1 uppercase tracking-wider">Jual Beli Amanah di Pulau Muna</p>
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 text-white text-center rounded-b-[2.5rem] shadow-lg">
+        <h1 class="text-2xl font-bold tracking-tight uppercase">🛒 RAHA MARKET</h1>
+        <p class="text-[10px] opacity-80 mt-1 font-semibold tracking-[0.2em]">JUAL BELI AMANAH DI RAHA</p>
     </div>
 
-    <!-- Kotak Nama -->
+    <!-- Kotak Input Nama -->
     <div class="px-4 -mt-6">
-        <div class="bg-white p-4 rounded-2xl shadow-sm flex gap-2 border border-gray-100">
-            <input type="text" placeholder="Nama ko..." class="flex-1 bg-slate-50 border border-gray-100 p-3 rounded-xl outline-none text-sm">
-            <button class="bg-blue-500 text-white px-6 py-3 rounded-xl font-bold text-sm active:scale-95 transition-transform">Masuk</button>
+        <div class="bg-white p-4 rounded-2xl shadow-sm flex gap-2 border border-blue-50">
+            <input type="text" placeholder="Nama ko..." class="flex-1 bg-slate-50 p-3 rounded-xl outline-none text-sm border-none">
+            <button class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md">Masuk</button>
         </div>
     </div>
 
     <!-- Kotak Cari -->
     <div class="px-4 mt-4">
-        <div class="bg-white p-4 rounded-2xl shadow-sm flex items-center gap-3 border border-gray-100">
-            <span class="text-lg">🔍</span>
-            <input type="text" onkeyup="cariBarang(this.value)" placeholder="Cari barang..." class="flex-1 outline-none text-sm">
+        <div class="bg-white p-4 rounded-2xl shadow-sm flex items-center gap-3 border border-blue-50">
+            <span class="opacity-50">🔍</span>
+            <input type="text" id="inputCari" placeholder="Cari barang..." class="flex-1 outline-none text-sm border-none bg-transparent">
         </div>
     </div>
 
     <!-- Kategori -->
     <div class="px-4 mt-4 flex gap-2 overflow-x-auto no-scrollbar pb-1">
-        <button class="bg-blue-500 text-white px-5 py-2 rounded-xl text-sm font-medium shrink-0">Semua</button>
-        <button class="bg-white text-gray-600 px-5 py-2 rounded-xl text-sm font-medium border border-gray-100 shrink-0">HP</button>
-        <button class="bg-white text-gray-600 px-5 py-2 rounded-xl text-sm font-medium border border-gray-100 shrink-0">Motor</button>
-        <button class="bg-white text-gray-600 px-5 py-2 rounded-xl text-sm font-medium border border-gray-100 shrink-0">Makan</button>
+        <button class="bg-blue-600 text-white px-5 py-2 rounded-xl text-xs font-bold shrink-0 shadow-md">Semua</button>
+        <button class="bg-white text-gray-500 px-5 py-2 rounded-xl text-xs font-bold border border-gray-100 shrink-0">HP</button>
+        <button class="bg-white text-gray-500 px-5 py-2 rounded-xl text-xs font-bold border border-gray-100 shrink-0">Motor</button>
+        <button class="bg-white text-gray-500 px-5 py-2 rounded-xl text-xs font-bold border border-gray-100 shrink-0">Makan</button>
     </div>
 
     <!-- DAFTAR BARANG -->
     <div id="item-list" class="px-4 mt-4 grid grid-cols-2 gap-4">
-        <!-- Data masuk sini -->
+        <!-- Render barang di sini -->
     </div>
 
-    <!-- Tombol Tambah Hijau -->
-    <button onclick="bukaModal()" class="fixed bottom-8 right-6 bg-emerald-400 text-white w-16 h-16 rounded-full shadow-lg text-4xl flex items-center justify-center transition-transform active:scale-90 z-40 font-light">+</button>
+    <!-- Tombol Tambah -->
+    <button onclick="bukaModal()" class="fixed bottom-8 right-6 bg-emerald-500 text-white w-16 h-16 rounded-full shadow-2xl text-4xl flex items-center justify-center z-40 active:scale-90 transition-all font-light border-4 border-white">+</button>
 
     <!-- Modal Form -->
-    <div id="modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-        <div class="bg-white p-6 rounded-[2rem] w-full max-w-sm shadow-2xl">
-            <h2 class="text-xl font-bold mb-4 text-gray-800 text-center">Tambah Jualan</h2>
+    <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div class="bg-white p-6 rounded-[2rem] w-full max-w-sm shadow-2xl border border-white/20">
+            <h2 class="text-xl font-bold mb-4 text-gray-800 text-center uppercase tracking-tighter">Pasang Iklan</h2>
             <div class="space-y-3">
                 <input id="nama" type="text" placeholder="Nama Barang" class="w-full bg-slate-50 border border-gray-100 p-3 rounded-xl outline-none text-sm">
                 <input id="harga" type="number" placeholder="Harga (Rp)" class="w-full bg-slate-50 border border-gray-100 p-3 rounded-xl outline-none text-sm">
-                <input id="wa" type="text" placeholder="No WhatsApp (08...)" class="w-full bg-slate-50 border border-gray-100 p-3 rounded-xl outline-none text-sm">
+                <input id="wa" type="text" placeholder="Nomor WA (08...)" class="w-full bg-slate-50 border border-gray-100 p-3 rounded-xl outline-none text-sm">
                 <input id="gambar" type="text" placeholder="Link Gambar (Opsional)" class="w-full bg-slate-50 border border-gray-100 p-3 rounded-xl outline-none text-sm">
-                <a href="https://postimages.org/" target="_blank" class="block text-center text-blue-500 font-bold text-[10px] uppercase tracking-wider py-1 hover:underline">Klik di sini untuk upload foto</a>
+                <a href="https://postimages.org/" target="_blank" class="block text-center text-blue-600 font-bold text-[10px] uppercase py-2 hover:bg-blue-50 rounded-lg">Klik di sini untuk upload foto</a>
             </div>
             <div class="flex gap-2 mt-6">
-                <button onclick="tutupModal()" class="flex-1 py-3 text-gray-400 font-bold text-sm">BATAL</button>
-                <button onclick="simpanBarang()" id="btnSimpan" class="flex-1 bg-blue-500 text-white py-3 rounded-xl font-bold shadow-lg shadow-blue-100 text-sm">POSTING</button>
+                <button onclick="tutupModal()" class="flex-1 py-3 text-gray-400 font-bold text-xs uppercase">Batal</button>
+                <button onclick="simpanBarang()" id="btnSimpan" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold shadow-lg text-xs uppercase tracking-widest">POSTING</button>
             </div>
         </div>
     </div>
@@ -72,46 +73,47 @@
     <script>
         let semuaData = [];
 
-        // Fungsi Ambil Data (Cuma jalan saat dipanggil)
         async function muatData() {
             const list = document.getElementById('item-list');
-            list.innerHTML = '<p class="col-span-2 text-center text-gray-400 py-10 animate-pulse">Mencari jualan...</p>';
-            
             try {
                 const res = await fetch('/api/items');
-                semuaData = await res.json();
-                tampilkanData(semuaData);
+                const data = await res.json();
+                semuaData = data;
+                tampilkanData(data);
             } catch (e) {
-                list.innerHTML = '<p class="col-span-2 text-center text-red-400">Gagal ambil data.</p>';
+                list.innerHTML = '<p class="col-span-2 text-center text-red-400 text-xs mt-10">Koneksi Error. Cek internet ko!</p>';
             }
         }
 
         function tampilkanData(data) {
             const list = document.getElementById('item-list');
-            if (data.length === 0) {
-                list.innerHTML = '<p class="col-span-2 text-center text-gray-400 py-10">Belum ada jualan.</p>';
+            if (!data || data.length === 0) {
+                list.innerHTML = '<p class="col-span-2 text-center text-gray-400 py-10 text-xs">Belum ada barang jualan.</p>';
                 return;
             }
 
-            list.innerHTML = data.map(item => {
-                const foto = (item.gambar && item.gambar.trim() !== "") ? item.gambar : 'https://via.placeholder.com/300x300?text=No+Image';
+            // Gunakan DocumentFragment untuk render yang lebih halus (anti-glitch)
+            let html = '';
+            data.forEach(item => {
+                const foto = (item.gambar && item.gambar.trim() !== "") ? item.gambar : 'https://via.placeholder.com/300x300?text=Raha+Market';
                 const hargaFormat = new Intl.NumberFormat('id-ID').format(item.harga || 0);
                 const linkWA = `https://wa.me/${(item.wa || '').replace(/^0/, '62')}`;
 
-                return `
-                    <div class="bg-white rounded-[1.5rem] shadow-sm overflow-hidden flex flex-col border border-white">
-                        <div class="relative">
-                            <img src="${foto}" class="w-full h-32 object-cover" onerror="this.src='https://via.placeholder.com/300x300?text=Error+Link'">
-                            <span class="absolute top-2 right-2 bg-black/30 text-[9px] text-white px-2 py-0.5 rounded-md backdrop-blur-sm uppercase">Muna</span>
+                html += `
+                    <div class="bg-white rounded-[1.5rem] shadow-sm overflow-hidden flex flex-col border border-white active:scale-95 transition-transform duration-75">
+                        <div class="relative bg-slate-200 h-32 overflow-hidden">
+                            <img src="${foto}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=Error+Link'">
+                            <span class="absolute top-2 right-2 bg-black/40 text-[8px] text-white px-2 py-0.5 rounded-full backdrop-blur-sm uppercase font-bold tracking-widest">Baru</span>
                         </div>
                         <div class="p-3">
-                            <h3 class="text-sm font-semibold text-gray-700 truncate uppercase">${item.nama}</h3>
-                            <p class="text-blue-500 font-bold text-md mt-0.5 font-mono text-sm">Rp ${hargaFormat}</p>
-                            <a href="${linkWA}" target="_blank" class="mt-2 block text-center text-emerald-500 text-[10px] font-bold border border-emerald-50 py-2 rounded-lg bg-emerald-50/50 uppercase tracking-tighter">Hubungi</a>
+                            <h3 class="text-[11px] font-bold text-gray-700 truncate uppercase">${item.nama}</h3>
+                            <p class="text-blue-600 font-extrabold text-xs mt-1">Rp ${hargaFormat}</p>
+                            <a href="${linkWA}" target="_blank" class="mt-3 block text-center text-emerald-600 text-[9px] font-extrabold border border-emerald-100 py-2 rounded-lg bg-emerald-50/50 uppercase tracking-tighter shadow-sm">Chat Penjual</a>
                         </div>
                     </div>
                 `;
-            }).join('');
+            });
+            list.innerHTML = html;
         }
 
         async function simpanBarang() {
@@ -123,45 +125,51 @@
                 gambar: document.getElementById('gambar').value
             };
 
-            if(!data.nama || !data.harga) return alert("Isi nama dan harga dulu, Neo!");
+            if(!data.nama || !data.harga) {
+                alert("Minimal isi nama dan harga barangmu dulu!");
+                return;
+            }
 
             btn.disabled = true;
-            btn.innerText = "...";
+            btn.innerText = "PROSES...";
 
             try {
-                await fetch('/api/items', {
+                const resp = await fetch('/api/items', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
                 
-                // Reset form & tutup
-                document.getElementById('nama').value = '';
-                document.getElementById('harga').value = '';
-                document.getElementById('wa').value = '';
-                document.getElementById('gambar').value = '';
-                tutupModal();
-                muatData(); // Refresh data
+                if(resp.ok) {
+                    document.getElementById('nama').value = '';
+                    document.getElementById('harga').value = '';
+                    document.getElementById('wa').value = '';
+                    document.getElementById('gambar').value = '';
+                    tutupModal();
+                    await muatData(); 
+                }
             } catch (e) {
-                alert("Gagal kirim data!");
+                alert("Gagal posting barang!");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "POSTING";
             }
         }
 
-        function cariBarang(keyword) {
+        // Fitur Cari
+        document.getElementById('inputCari').addEventListener('input', (e) => {
+            const keyword = e.target.value.toLowerCase();
             const hasil = semuaData.filter(item => 
-                item.nama.toLowerCase().includes(keyword.toLowerCase())
+                item.nama.toLowerCase().includes(keyword)
             );
             tampilkanData(hasil);
-        }
+        });
 
         function bukaModal() { document.getElementById('modal').classList.remove('hidden'); }
         function tutupModal() { document.getElementById('modal').classList.add('hidden'); }
 
-        // JALANKAN CUMA SEKALI SAJA
-        document.addEventListener('DOMContentLoaded', muatData);
+        // Start!
+        window.addEventListener('load', muatData);
     </script>
 </body>
 </html>
