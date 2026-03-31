@@ -64,21 +64,27 @@
     </div>
 
     <script>
-        async function loadItems() {
-            try {
-                const res = await fetch('/api/items');
-                const items = await res.json();
-                const list = document.getElementById('item-list');
-                list.innerHTML = '';
+    // Variabel supaya tidak panggil data berkali-kali
+    let sedangMemuat = false;
 
-                if (items.length === 0) {
-                    list.innerHTML = '<p class="col-span-2 text-center text-gray-400 mt-10">Belum ada jualan.</p>';
-                    return;
-                }
+    async function loadItems() {
+        if (sedangMemuat) return; // Kalau lagi proses, jangan panggil lagi
+        sedangMemuat = true;
 
+        try {
+            const res = await fetch('/api/items');
+            const items = await res.json();
+            const list = document.getElementById('item-list');
+            
+            // Cek kalau datanya sama, tidak perlu tulis ulang (biar nda kedip)
+            let htmlBaru = '';
+
+            if (items.length === 0) {
+                htmlBaru = '<p class="col-span-2 text-center text-gray-400 mt-10">Belum ada jualan.</p>';
+            } else {
                 items.forEach(item => {
                     const foto = (item.gambar && item.gambar.trim() !== "") ? item.gambar : 'https://via.placeholder.com/300x300?text=No+Image';
-                    list.innerHTML += `
+                    htmlBaru += `
                         <div class="bg-white rounded-[1.5rem] shadow-sm overflow-hidden flex flex-col border border-gray-50">
                             <div class="relative">
                                 <img src="${foto}" class="w-full h-32 object-cover" onerror="this.src='https://via.placeholder.com/300x300?text=Link+Error'">
@@ -92,35 +98,68 @@
                         </div>
                     `;
                 });
-            } catch (e) {
-                console.log("Error loading items");
             }
+
+            // Hanya ganti isi kalau memang beda
+            if (list.innerHTML !== htmlBaru) {
+                list.innerHTML = htmlBaru;
+            }
+        } catch (e) {
+            console.log("Error loading items");
+        } finally {
+            sedangMemuat = false;
+        }
+    }
+
+    async function simpanBarang() {
+        const btnPosting = event.target;
+        btnPosting.disabled = true; // Matikan tombol biar nda double posting
+        btnPosting.innerText = "Proses...";
+
+        const data = {
+            nama: document.getElementById('nama').value,
+            harga: document.getElementById('harga').value,
+            wa: document.getElementById('wa').value,
+            gambar: document.getElementById('gambar').value
+        };
+
+        if(!data.nama || !data.harga) {
+            alert("Isi nama & harga dulu!");
+            btnPosting.disabled = false;
+            btnPosting.innerText = "Posting";
+            return;
         }
 
-        async function simpanBarang() {
-            const data = {
-                nama: document.getElementById('nama').value,
-                harga: document.getElementById('harga').value,
-                wa: document.getElementById('wa').value,
-                gambar: document.getElementById('gambar').value
-            };
-
-            if(!data.nama || !data.harga) return alert("Isi nama & harga dulu!");
-
+        try {
             await fetch('/api/items', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
 
+            // Kosongkan form
+            document.getElementById('nama').value = '';
+            document.getElementById('harga').value = '';
+            document.getElementById('wa').value = '';
+            document.getElementById('gambar').value = '';
+
             tutupModal();
             loadItems();
+        } catch (e) {
+            alert("Gagal posting!");
+        } finally {
+            btnPosting.disabled = false;
+            btnPosting.innerText = "Posting";
         }
+    }
 
-        function bukaModal() { document.getElementById('modal').classList.remove('hidden'); }
-        function tutupModal() { document.getElementById('modal').classList.add('hidden'); }
+    function bukaModal() { document.getElementById('modal').classList.remove('hidden'); }
+    function tutupModal() { document.getElementById('modal').classList.add('hidden'); }
 
-        loadItems();
-    </script>
+    // Panggil sekali saja saat pertama buka
+    window.onload = loadItems;
+</script>
+
+        
 </body>
 </html>
